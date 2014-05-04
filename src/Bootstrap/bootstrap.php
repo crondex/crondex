@@ -8,7 +8,7 @@ use Crondex\Routing\Router;
 use Crondex\Session\SessionManager;
 use Crondex\Auth\Auth;
 use Crondex\Log\Msg;
-use Crondex\Html\Clean;
+use Crondex\Html\Sanitize;
 use Crondex\Bootstrap\RecursiveArrayWalk;
 use Crondex\Bootstrap\RemoveMagicQuotes;
 
@@ -75,7 +75,7 @@ try {
         $viewObj = new View($view,$action);
 
         //instantiate input cleaner
-        $clean = new Clean;
+        $sanitize = new Sanitize;
 
         //This instantiates the crondex object (which is an instance of $controller (the subcontroller),
         //which extends Controller (the main/front controller) and also injects model and view objects
