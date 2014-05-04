@@ -34,12 +34,14 @@ use Crondex\View\ViewInterface;
 class Controller
 {
     protected $model;
+    protected $_model = array();
     protected $_view;
 
-    public function __construct(ModelInterface $modelObj,$model, ViewInterface $viewObj)
+    public function __construct(ModelInterface $modelObj, ViewInterface $viewObj)
     {
         //inject model object (using the $model variable)
-	$this->$model = $modelObj;
+	//$this->$model = $modelObj;
+	$this->_model = $modelObj;
 
         //inject view object
 	$this->_view = $viewObj;
@@ -61,8 +63,6 @@ class Controller
 
     public function __destruct()
     {
-        echo '<br />Controller has been destructed<br />';
-        
         //this extracts the variables set by 'set()' above, and then
         //includes the the subview (view_file.php).
         $this->_view->render();

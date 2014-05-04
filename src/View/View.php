@@ -34,9 +34,4 @@ class View implements ViewInterface
             echo "404 will be included here.";
 	}
     }
-
-    public function __destruct()
-    {
-        echo '<br />View has been destructed<br />';
-    }
 }

@@ -79,7 +79,7 @@ try {
 
         //This instantiates the crondex object (which is an instance of $controller (the subcontroller),
         //which extends Controller (the main/front controller) and also injects model and view objects
-        $crondex = new $controller($modelObj,$model,$viewObj);
+        $crondex = new $controller($modelObj,$viewObj);
 
         if (!is_array($parameters)) {
 
