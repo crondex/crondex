@@ -1,4 +1,4 @@
-<?php namespace Crondex\Bootstrap;
+<?php namespace Crondex\Helpers;
 
 interface RemoveMagicQuotesInterface
 {

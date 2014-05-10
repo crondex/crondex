@@ -45,7 +45,7 @@ class SessionManager extends \SessionHandler
         $_SESSION['timeout'] = time() + $maxlife;
 
         //uncomment next line if encrypting data
-        //$this->_sessionKey = $sessionKey;
+        //$this->sessionKey = $sessionKey;
     }
 
     public function read($id)
@@ -54,13 +54,13 @@ class SessionManager extends \SessionHandler
         return $data;
 
         //replace the return line with this next line to encrypt
-        //return mcrypt_decrypt(MCRYPT_3DES, $this->_sessionKey, $data, MCRYPT_MODE_ECB);
+        //return mcrypt_decrypt(MCRYPT_3DES, $this->sessionKey, $data, MCRYPT_MODE_ECB);
     }
 
     public function write($id, $data)
     {
         //add this next line to encrypt data
-        //$data = mcrypt_encrypt(MCRYPT_3DES, $this->_sessionKey, $data, MCRYPT_MODE_ECB);
+        //$data = mcrypt_encrypt(MCRYPT_3DES, $this->sessionKey, $data, MCRYPT_MODE_ECB);
         //source: http://www.php.net/manual/en/class.sessionhandler.php
 
         return parent::write($id, $data);

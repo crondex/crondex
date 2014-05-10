@@ -4,14 +4,14 @@
 
 class View implements ViewInterface
 {
-    protected $_view;
-    protected $_action;
+    protected $view;
+    protected $action;
     protected $variables = array();
 
     public function __construct($view, $action)
     {
-        $this->_view = $view;
-	$this->_action = $action;
+        $this->view = $view;
+	$this->action = $action;
     }
 
     public function set($name,$value)
@@ -24,7 +24,7 @@ class View implements ViewInterface
         extract($this->variables);
 
 	//set view file
-        $view_file = ROOT . DS . 'app' . DS . 'views' . DS . $this->_view . DS . $this->_action . '.php';
+        $view_file = ROOT . DS . 'app' . DS . 'views' . DS . $this->view . DS . $this->action . '.php';
 
         //load view file
         if (file_exists($view_file)) {

@@ -9,8 +9,8 @@ use Crondex\Session\SessionManager;
 use Crondex\Auth\Auth;
 use Crondex\Log\Msg;
 use Crondex\Html\Sanitize;
-use Crondex\Bootstrap\RecursiveArrayWalk;
-use Crondex\Bootstrap\RemoveMagicQuotes;
+use Crondex\Helpers\RecursiveArrayWalk;
+use Crondex\Helpers\RemoveMagicQuotes;
 
 setReporting();
 //removeMagicQuotes();

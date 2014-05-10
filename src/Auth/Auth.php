@@ -6,15 +6,15 @@ use Crondex\Security\RandomInterface;
 
 class Auth extends Model implements AuthInterface
 {
-    protected $_random;
-    protected $_user;
-    protected $_token;
-    private $_loggedInUsersTable;
-    private $_sessionIdColumn;
-    private $_tokenColumn;
-    private $_userIdColumn;
-    private $_adminTable;
-    private $_usernameColumn;
+    protected $random;
+    protected $user;
+    protected $token;
+    private $loggedInUsersTable;
+    private $sessionIdColumn;
+    private $tokenColumn;
+    private $userIdColumn;
+    private $adminTable;
+    private $usernameColumn;
 
     public function __construct($config, RandomInterface $randomObj)
     {
@@ -22,15 +22,15 @@ class Auth extends Model implements AuthInterface
         parent::__construct($config);
 
         //inject object
-        $this->_random = $randomObj;
+        $this->random = $randomObj;
 
         //get database table and column names (from main.ini config)
-        $this->_loggedInUsersTable = $config->get('loggedInUsersTable');
-        $this->_sessionIdColumn = $config->get('sessionIdColumn');
-        $this->_tokenColumn = $config->get('tokenColumn');
-        $this->_userIdColumn = $config->get('userIdColumn');
-        $this->_adminTable = $config->get('adminTable');
-        $this->_usernameColumn = $config->get('usernameColumn');
+        $this->loggedInUsersTable = $config->get('loggedInUsersTable');
+        $this->sessionIdColumn = $config->get('sessionIdColumn');
+        $this->tokenColumn = $config->get('tokenColumn');
+        $this->userIdColumn = $config->get('userIdColumn');
+        $this->adminTable = $config->get('adminTable');
+        $this->usernameColumn = $config->get('usernameColumn');
     }
 
     protected function setToken() {
@@ -38,13 +38,13 @@ class Auth extends Model implements AuthInterface
         /*
          * Assign a random value to $token
          */
-        $token = $this->_random->get_random_bytes(50);
+        $token = $this->random->get_random_bytes(50);
 
         /*
          * hash the token
          * although not a password, we're using the password_hash function
          */
-        $this->_token = password_hash($token, PASSWORD_BCRYPT, array("cost" => 5));
+        $this->token = password_hash($token, PASSWORD_BCRYPT, array("cost" => 5));
 
         if (isset($token)) {
             return true;
@@ -59,11 +59,11 @@ class Auth extends Model implements AuthInterface
 
         //setup session
         if ($this->setToken()) {
-            $_SESSION['token'] = $this->_token;
+            $_SESSION['token'] = $this->token;
 
             //set sql to update token logged-in-users
-            $sql = "UPDATE $this->_loggedInUsersTable SET $this->_sessionIdColumn=?, $this->_tokenColumn=? WHERE $this->_userIdColumn=?";
-            $params = array(session_id(), $this->_token, $userID);
+            $sql = "UPDATE $this->loggedInUsersTable SET $this->sessionIdColumn=?, $this->tokenColumn=? WHERE $this->userIdColumn=?";
+            $params = array(session_id(), $this->token, $userID);
 
             //update database
             if ($this->query($sql, $params, 'names')) {
@@ -84,7 +84,7 @@ class Auth extends Model implements AuthInterface
         if (isset($_SESSION['user_id']) || isset($_SESSION['token'])) {
 
             //delete logged-in users
-            $sql = "DELETE FROM $this->_loggedInUsersTable WHERE $this->_userIdColumn=? OR $this->_sessionIdColumn=? OR $this->_tokenColumn=?";
+            $sql = "DELETE FROM $this->loggedInUsersTable WHERE $this->userIdColumn=? OR $this->sessionIdColumn=? OR $this->tokenColumn=?";
             $params = array($_SESSION['user_id'], session_id(), $_SESSION['token']);
         
             if ($this->query($sql, $params, 'names')) {
@@ -98,7 +98,7 @@ class Auth extends Model implements AuthInterface
     public function login($user) {
 
         //grab user row based on username
-        $sql = "SELECT * FROM $this->_adminTable WHERE $this->_usernameColumn=?";
+        $sql = "SELECT * FROM $this->adminTable WHERE $this->usernameColumn=?";
         $params = array($user);
         $rows = $this->query($sql, $params, 'names');
 
@@ -114,7 +114,7 @@ class Auth extends Model implements AuthInterface
 
         //setup session vars
         if ($this->setToken()) {
-            $_SESSION['token'] = $this->_token;
+            $_SESSION['token'] = $this->token;
             $_SESSION['user_id'] = $user_id;
             $_SESSION['username'] = $user;
         } else {
@@ -125,8 +125,8 @@ class Auth extends Model implements AuthInterface
         if ($this->removeLoggedInUser()) {
 
             //next insert new 'logged_in_user' record
-            $sql = "INSERT INTO $this->_loggedInUsersTable ($this->_userIdColumn, $this->_sessionIdColumn, $this->_tokenColumn) VALUES (?, ?, ?)";
-            $params = array($user_id, session_id(), $this->_token);
+            $sql = "INSERT INTO $this->loggedInUsersTable ($this->userIdColumn, $this->sessionIdColumn, $this->tokenColumn) VALUES (?, ?, ?)";
+            $params = array($user_id, session_id(), $this->token);
 
             //grab the hash from the user's row
             if ($this->query($sql, $params, 'names')) {
@@ -143,7 +143,7 @@ class Auth extends Model implements AuthInterface
     {
         if (isset($_SESSION['user_id'])) {
 
-            $sql = "SELECT * FROM $this->_loggedInUsersTable WHERE $this->_userIdColumn=?";
+            $sql = "SELECT * FROM $this->loggedInUsersTable WHERE $this->userIdColumn=?";
             $params = array($_SESSION['user_id']);
             $rows = $this->query($sql, $params, 'names');
 
@@ -160,7 +160,7 @@ class Auth extends Model implements AuthInterface
                 if ($session_id === session_id() && $token === $_SESSION['token']) {
 
                     //they are the same
-                    $this->refresh($this->_loggedInUsersTable, $_SESSION['user_id']);
+                    $this->refresh($this->loggedInUsersTable, $_SESSION['user_id']);
 
                 } else {
 

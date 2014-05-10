@@ -20,7 +20,7 @@
 * If input has been set via $_POST, it is then passed to the subcontroller (and set via set()).
 * and which then passes it to the front/main Controller, which passes them to the view (also via set()).
 *
-* Upon destruction, the main/front Controller then renders the view (calling $_view->render()). This
+* Upon destruction, the main/front Controller then renders the view (calling $view->render()). This
 * extracts the variables set (via set()) and includes the subview file (which is included as view_file.php)
 *
 * Because these variables were set via the View and the subview file was included at the same time,
@@ -34,17 +34,15 @@ use Crondex\View\ViewInterface;
 class Controller
 {
     protected $model;
-    protected $_model = array();
-    protected $_view;
+    protected $view;
 
     public function __construct(ModelInterface $modelObj, ViewInterface $viewObj)
     {
         //inject model object (using the $model variable)
-	//$this->$model = $modelObj;
-	$this->_model = $modelObj;
+	$this->model = $modelObj;
 
         //inject view object
-	$this->_view = $viewObj;
+	$this->view = $viewObj;
     }
 
     public function getPost($value)
@@ -58,13 +56,13 @@ class Controller
 
     public function set($name,$value)
     {
-        $this->_view->set($name,$value);
+        $this->view->set($name,$value);
     }
 
     public function __destruct()
     {
         //this extracts the variables set by 'set()' above, and then
         //includes the the subview (view_file.php).
-        $this->_view->render();
+        $this->view->render();
     }
 }

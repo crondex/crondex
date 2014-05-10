@@ -4,20 +4,20 @@ use Exception;
 
 class Config
 {
-    protected $_configFilePath;
-    protected $_config = array();
+    protected $configFilePath;
+    protected $config = array();
 
     public function __construct($configFilePath)
     {
-        $this->_configFilePath = $configFilePath;
+        $this->configFilePath = $configFilePath;
         $this->set();
     }
 
     protected function set()
     {
         try {
-            if (file_exists($this->_configFilePath)){
-                $this->_config = parse_ini_file($this->_configFilePath, true); //'true' processes sections
+            if (file_exists($this->configFilePath)){
+                $this->config = parse_ini_file($this->configFilePath, true); //'true' processes sections
             } else {
                 throw new Exception('Configuration file not found');
             }
@@ -28,9 +28,9 @@ class Config
 
     public function get($configKey) {
        try {
-            if ($this->_config !== NULL) {
-                if (array_key_exists($configKey, $this->_config)) {
-                    return $this->_config[$configKey];
+            if ($this->config !== NULL) {
+                if (array_key_exists($configKey, $this->config)) {
+                    return $this->config[$configKey];
                 } else {
                     throw new Exception('Config Variable ' . $configKey . ' does not exist');
                 }
