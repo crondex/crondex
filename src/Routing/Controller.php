@@ -54,6 +54,15 @@ class Controller
         }
     }
 
+    public function getGet($value)
+    {
+        if (isset($_GET["$value"])) {
+            return $_GET["$value"];
+        } else {
+            return false;
+        }      
+    }
+
     public function set($name,$value)
     {
         $this->view->set($name,$value);

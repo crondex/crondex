@@ -72,9 +72,34 @@ class RecursiveArrayWalk implements RecursiveArrayWalkInterface
             //same as $this->function($value);
             $this->value = call_user_func($this->function, $value);
         } else {
-            //if call this method for each element of array
-            $this->value = array_map(array($this, 'traverse'), $value);
-        }
+
+            //if the array is a list
+            if (array_values($value) == $value) {
+                //call this method for each element of array
+                $this->value = array_map(array($this, 'traverse'), $value);
+
+            //else if it is an associative array
+            } else {
+
+                //loop through keys ($value is an array)
+                foreach ($value as $key => $val) {
+
+                    if (!is_int($key)) {
+
+                        //apply function to key
+                        $newKey = call_user_func($this->function, $key);
+
+                        //set new key
+                        $value[$newKey] = $value[$key];
+
+                        //unset old key
+                        unset($value[$key]);
+                    }
+                }
+
+                $this->value = array_map(array($this, 'traverse'), $value);
+            }
+       }
         return $this->value;
     }
 
