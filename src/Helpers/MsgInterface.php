@@ -1,4 +1,4 @@
-<?php namespace Crondex\Log;
+<?php namespace Crondex\Helpers;
 
 interface MsgInterface
 {
