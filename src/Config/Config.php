@@ -2,7 +2,7 @@
 
 use Exception;
 
-class Config
+class Config implements ConfigInterface
 {
     protected $configFilePath;
     protected $config = array();
@@ -26,7 +26,8 @@ class Config
         }
     }
 
-    public function get($configKey) {
+    public function get($configKey)
+    {
        try {
             if ($this->config !== NULL) {
                 if (array_key_exists($configKey, $this->config)) {

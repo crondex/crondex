@@ -3,6 +3,7 @@
 use Crondex\Model\Model;
 use Crondex\Security\Random;
 use Crondex\Security\RandomInterface;
+use Crondex\Config\EnvironmentInterface;
 
 class Auth extends Model implements AuthInterface
 {
@@ -21,8 +22,9 @@ class Auth extends Model implements AuthInterface
         //call the parent constructor
         parent::__construct($config);
 
-        //inject object
+        //inject objects
         $this->random = $randomObj;
+        $this->config = $config;
 
         //get database table and column names (from main.ini config)
         $this->loggedInUsersTable = $config->get('loggedInUsersTable');
@@ -95,8 +97,8 @@ class Auth extends Model implements AuthInterface
         return false;
     }
 
-    public function login($user) {
-
+    public function login($user)
+    {
         //grab user row based on username
         $sql = "SELECT * FROM $this->adminTable WHERE $this->usernameColumn=?";
         $params = array($user);
@@ -128,7 +130,6 @@ class Auth extends Model implements AuthInterface
             $sql = "INSERT INTO $this->loggedInUsersTable ($this->userIdColumn, $this->sessionIdColumn, $this->tokenColumn) VALUES (?, ?, ?)";
             $params = array($user_id, session_id(), $this->token);
 
-            //grab the hash from the user's row
             if ($this->query($sql, $params, 'names')) {
 	        return true;
             } else {
@@ -139,6 +140,7 @@ class Auth extends Model implements AuthInterface
         }
     }
 
+    //check if logged in
     public function check()
     {
         if (isset($_SESSION['user_id'])) {

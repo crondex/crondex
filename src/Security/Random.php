@@ -14,7 +14,7 @@ class Random implements RandomInterface {
 
 	private $random_state;
 
-	function get_random_bytes($count)
+	public function get_random_bytes($count)
 	{
 		$output = '';
 		if (is_readable('/dev/urandom') &&

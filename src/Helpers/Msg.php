@@ -9,14 +9,15 @@ class Msg implements MsgInterface
 
     public function __construct()
     {
-        $this->debug = true;
+        //to do: inject this from config
+        $this->debug = 'off';
     }
         
     public function fail($pubMsg, $pvtMsg = '')
     {
         $this->message = $pubMsg;
 
-        if ($this->debug && $pvtMsg !== '') {
+        if ($this->debug === 'on' && $pvtMsg !== '') {
             $this->message .= ": $pvtMsg";
         }
         $this->errorMessage = 'An error occured' . $this->message . '<br />';

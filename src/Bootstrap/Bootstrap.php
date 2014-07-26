@@ -1,6 +1,7 @@
 <?php namespace Crondex;
 
 use Crondex\Config\Config;
+use Crondex\Config\Environment;
 use Crondex\View\View;
 use Crondex\Security\Random;
 use Crondex\Routing\ParseUri;
@@ -11,21 +12,31 @@ use Crondex\Html\Sanitize;
 use Crondex\Helpers\Msg;
 use Crondex\Helpers\RecursiveArrayWalk;
 use Crondex\Helpers\RemoveMagicQuotes;
+use Exception;
 
 class Bootstrap {
 
-    public function __construct()
+    protected $configFilePath;
+    protected $routesFilePath;
+
+    public function __construct($configFilePath, $routesFilePath)
     {
-        setReporting();
-        unregisterGlobals();
-        noCache();
+        $this->configFilePath = $configFilePath;
+        $this->routesFilePath = $routesFilePath;
 
         try {
+            //instatiate configs
+            $config = new Config($this->configFilePath);
+            $routes = new Config($this->routesFilePath);
 
+            //configure environment
+            $envObj = new Environment; 
+            $envObj->reporting($config->get('displayErrors'), $config->get('errorLogPath'));
+            $envObj->unregisterGlobals();
+           
             //remove magic quotes
             $recursiveArrayWalk = new RecursiveArrayWalk;
             $removeMagicQuotes = new RemoveMagicQuotes($recursiveArrayWalk);
-
             $_GET = $removeMagicQuotes->removeQuotes($_GET);
             $_POST = $removeMagicQuotes->removeQuotes($_POST);
             $_COOKIE = $removeMagicQuotes->removeQuotes($_COOKIE);
@@ -33,19 +44,18 @@ class Bootstrap {
             //this is set via public/.htaccess
             $uri = $_GET['uri'];
 
-            //inject these paths when I make bootstrap a class;
-            $config = new Config(ROOT . DS . 'app' . DS . 'config' . DS . 'main.ini');
-            $routes = new Config(ROOT . DS . 'app' . DS . 'config' . DS . 'routes.ini');
+            //parse usi and set routes
             $parseUriObj = new ParseUri($uri);
             $router = new Router($uri, $routes, $parseUriObj);
-
             $model = $router->getRouteValue('model');
             $controller = $router->getRouteValue('controller');
             $action = $router->getRouteValue('action');
             $view = $router->getRouteValue('view');
             $parameters = $router->getRouteValue('parameters');
 
-            $randomObj = new Random; //this is from PHPass
+            //instantiate random token generator
+            //this is from PHPass
+            $randomObj = new Random;
 
             //instantiate session handler
             $sessionManager = new SessionManager($config);
@@ -67,7 +77,7 @@ class Bootstrap {
             if ((int)method_exists($controller, $action)) {
  
                 //instantiate model
-                $modelObj = new $model($config,$randomObj,$authObj,$msgObj);
+                $modelObj = new $model($config,$randomObj,$authObj,$msgObj,$envObj);
 
                 //instantiate view (template)
                 $viewObj = new View($view,$action);
@@ -100,7 +110,9 @@ class Bootstrap {
         } catch (Exception $Exception) {
 
             if ($Exception->getMessage() === '404') {
-                throw404();
+                header("HTTP/1.0 404 Not Found");
+                include (ROOT . DS . 'app' . DS . 'views' . DS . '404' . DS . 'index.php');
+                exit();
             }
         }
     }
