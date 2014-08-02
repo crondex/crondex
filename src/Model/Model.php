@@ -6,6 +6,8 @@ class Model extends Database implements ModelInterface
 {
     protected $class;
     protected $table;
+    protected $user_id;
+    protected $loggedInUserDetails;
 
     public function __construct($config)
     {
@@ -14,7 +16,7 @@ class Model extends Database implements ModelInterface
 
         //gets the class and strip Model off the end
         $this->table = strtolower(rtrim($this->class, 'Model'));
-    }
+   }
 
     public function selectAll()
     {

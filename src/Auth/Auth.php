@@ -7,6 +7,7 @@ use Crondex\Config\EnvironmentInterface;
 
 class Auth extends Model implements AuthInterface
 {
+    public $loggedInUser;
     protected $random;
     protected $user;
     protected $token;
@@ -14,24 +15,25 @@ class Auth extends Model implements AuthInterface
     private $sessionIdColumn;
     private $tokenColumn;
     private $userIdColumn;
-    private $adminTable;
+    private $usersTable;
     private $usernameColumn;
 
-    public function __construct($config, RandomInterface $randomObj)
+    public function __construct($config, RandomInterface $randomObj, $sessionManagerObj)
     {
         //call the parent constructor
         parent::__construct($config);
 
         //inject objects
-        $this->random = $randomObj;
         $this->config = $config;
+        $this->random = $randomObj;
+        $this->session = $sessionManagerObj;
 
         //get database table and column names (from main.ini config)
         $this->loggedInUsersTable = $config->get('loggedInUsersTable');
         $this->sessionIdColumn = $config->get('sessionIdColumn');
         $this->tokenColumn = $config->get('tokenColumn');
         $this->userIdColumn = $config->get('userIdColumn');
-        $this->adminTable = $config->get('adminTable');
+        $this->usersTable = $config->get('usersTable');
         $this->usernameColumn = $config->get('usernameColumn');
     }
 
@@ -47,19 +49,16 @@ class Auth extends Model implements AuthInterface
          * although not a password, we're using the password_hash function
          */
         $this->token = password_hash($token, PASSWORD_BCRYPT, array("cost" => 5));
-
-        if (isset($token)) {
-            return true;
-        }
-        return false;
+        return true;
     }
 
     protected function refresh($userID)
     {
         //Regenerate id
-	session_regenerate_id();
+        //session_regenerate_id(true);
+        $this->session->regenerate();
 
-        //setup session
+        //set session token and update database
         if ($this->setToken()) {
             $_SESSION['token'] = $this->token;
 
@@ -70,13 +69,13 @@ class Auth extends Model implements AuthInterface
             //update database
             if ($this->query($sql, $params, 'names')) {
 
-                //session has been updated
+                //session details have been updated in database
                 return true;
             }
-            //session update failed
+            //updating database failed
             return false;
         }
-        //session update failed - new token not set
+        //session database update failed - new token not set
         return false;
     }
 
@@ -100,7 +99,7 @@ class Auth extends Model implements AuthInterface
     public function login($user)
     {
         //grab user row based on username
-        $sql = "SELECT * FROM $this->adminTable WHERE $this->usernameColumn=?";
+        $sql = "SELECT * FROM $this->usersTable WHERE $this->usernameColumn=?";
         $params = array($user);
         $rows = $this->query($sql, $params, 'names');
 
@@ -116,9 +115,11 @@ class Auth extends Model implements AuthInterface
 
         //setup session vars
         if ($this->setToken()) {
+
             $_SESSION['token'] = $this->token;
             $_SESSION['user_id'] = $user_id;
             $_SESSION['username'] = $user;
+
         } else {
             return false;
         }
@@ -135,18 +136,50 @@ class Auth extends Model implements AuthInterface
             } else {
                 return false;
             }
+
         } else {
             return false;
         }
     }
 
-    //check if logged in
-    public function check()
+    public function getLoggedInUserDetails($user_id)
     {
-        if (isset($_SESSION['user_id'])) {
+        //if (isset($user_id) && $this->check($user_id)) {
+        //We don't need to run $this->check because it's run by the bootstrap
+
+        if (isset($user_id)) {
+
+            //set prepared statements
+            $sql = "SELECT * FROM $this->usersTable WHERE id=?";
+            $params = array($user_id);
+            $rows = $this->query($sql, $params, 'names');
+
+            //was the query successful
+            if ($rows) {
+
+                //loop through each row (there should only be one match)
+                foreach ($rows as $row) {
+                    $this->username = $row['username'];
+                    $this->first_name = $row['first_name'];
+                    $this->last_name = $row['last_name'];
+                    $this->email = $row['email'];
+                    $this->role_id = $row['role_id'];
+                }    
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        } 
+    }
+
+    //check if logged in
+    public function check($user_id)
+    {
+        if (isset($user_id)) {
 
             $sql = "SELECT * FROM $this->loggedInUsersTable WHERE $this->userIdColumn=?";
-            $params = array($_SESSION['user_id']);
+            $params = array($user_id);
             $rows = $this->query($sql, $params, 'names');
 
             if ($rows) {
@@ -162,15 +195,19 @@ class Auth extends Model implements AuthInterface
                 if ($session_id === session_id() && $token === $_SESSION['token']) {
 
                     //they are the same
-                    $this->refresh($this->loggedInUsersTable, $_SESSION['user_id']);
+                    $this->refresh($user_id);
+                    return true;
 
                 } else {
 
                     //they are different
                     $this->logout();
+                    return false;
                 }
             }
+            return false;
         }
+        return false;
     }
 
     public function logout()

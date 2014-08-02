@@ -38,7 +38,7 @@ class SessionManager extends \SessionHandler
         if (isset($_SESSION['timeout']) && $_SESSION['timeout'] < time()) {
             session_destroy();
             session_start();
-            session_regenerate_id();
+            $this->regenerate;
             $_SESSION = array();
         }
 
@@ -64,6 +64,23 @@ class SessionManager extends \SessionHandler
         //source: http://www.php.net/manual/en/class.sessionhandler.php
 
         return parent::write($id, $data);
+    }
+
+    public function regenerate()
+    {
+        //check to see if the session regeneration has already been initiated
+	if (!isset($_SESSION['reload_timeout']) || $_SESSION['reload_timeout'] < time()) {
+
+            //this sets the expiration to 10 seconds in the future
+            $_SESSION['reload_timeout'] = time() + 10;
+
+            //create a new (and discard old) session
+            session_regenerate_id(true); 
+            return true;
+
+        } else {
+            return false;
+        }
     }
 }
 

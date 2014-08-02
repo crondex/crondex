@@ -58,13 +58,17 @@ class Bootstrap {
             $randomObj = new Random;
 
             //instantiate session handler
-            $sessionManager = new SessionManager($config);
-            session_set_save_handler($sessionManager);
+            $sessionManagerObj = new SessionManager($config);
+            session_set_save_handler($sessionManagerObj);
 
             //instatiate auth manager and check auth/session
             if ($config->get('auth') === 'on') {
-                $authObj = new Auth($config,$randomObj);
-                $authObj->check();
+                $authObj = new Auth($config,$randomObj,$sessionManagerObj);
+                if (isset($_SESSION['user_id'])) {
+                    if ($authObj->check($_SESSION['user_id'])) {
+                        $authObj->getLoggedInUserDetails($_SESSION['user_id']);
+                    }
+                }
             } else {
                 $authObj = NULL;
             }
