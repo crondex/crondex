@@ -38,7 +38,7 @@ class SessionManager extends \SessionHandler
         if (isset($_SESSION['timeout']) && $_SESSION['timeout'] < time()) {
             session_destroy();
             session_start();
-            $this->regenerate;
+            $this->regenerate();
             $_SESSION = array();
         }
 
