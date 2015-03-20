@@ -7,11 +7,11 @@ use Crondex\Security\Random;
 use Crondex\Routing\ParseUri;
 use Crondex\Routing\Router;
 use Crondex\Session\SessionManager;
-use Crondex\Auth\Auth;
 use Crondex\Html\Sanitize;
 use Crondex\Helpers\Msg;
 use Crondex\Helpers\RecursiveArrayWalk;
 use Crondex\Helpers\RemoveMagicQuotes;
+use CrondexAuth\Auth;
 use Exception;
 
 class Bootstrap {
