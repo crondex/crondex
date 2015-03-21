@@ -9,8 +9,6 @@ use Crondex\Routing\Router;
 use Crondex\Session\SessionManager;
 use Crondex\Html\Sanitize;
 use Crondex\Helpers\Msg;
-use Crondex\Helpers\RecursiveArrayWalk;
-use Crondex\Helpers\RemoveMagicQuotes;
 use CrondexAuth\Auth;
 use Exception;
 
@@ -32,7 +30,6 @@ class Bootstrap {
             //configure environment
             $envObj = new Environment; 
             $envObj->reporting($config->get('displayErrors'), $config->get('errorLogPath'));
-            $envObj->unregisterGlobals();
            
             //this is set via public/.htaccess
             $uri = $_GET['uri'];
