@@ -34,13 +34,6 @@ class Bootstrap {
             $envObj->reporting($config->get('displayErrors'), $config->get('errorLogPath'));
             $envObj->unregisterGlobals();
            
-            //remove magic quotes
-            $recursiveArrayWalk = new RecursiveArrayWalk;
-            $removeMagicQuotes = new RemoveMagicQuotes($recursiveArrayWalk);
-            $_GET = $removeMagicQuotes->removeQuotes($_GET);
-            $_POST = $removeMagicQuotes->removeQuotes($_POST);
-            $_COOKIE = $removeMagicQuotes->removeQuotes($_COOKIE);
-
             //this is set via public/.htaccess
             $uri = $_GET['uri'];
 
