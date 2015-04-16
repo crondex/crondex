@@ -4,10 +4,26 @@ use Crondex\Database\Database;
 
 class Model extends Database implements ModelInterface
 {
+
+/*
     protected $class;
     protected $table;
     protected $user_id;
     protected $loggedInUserDetails;
+*/
+
+    /**
+     * Injected Config object
+     *
+     * @var object $config
+     */
+    public $config;
+
+    /**
+     * Constructor
+     *
+     * @param object $config
+     */
 
     public function __construct($config)
     {

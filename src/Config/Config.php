@@ -7,12 +7,22 @@ class Config implements ConfigInterface
     protected $configFilePath;
     protected $config = array();
 
+    /**
+     * Constructor
+     *
+     * @param string $configFilePath
+     */
     public function __construct($configFilePath)
     {
         $this->configFilePath = $configFilePath;
         $this->set();
     }
 
+    /**
+     * Sets configs via the config file injected in the constructor
+     *
+     * @return void
+     */
     protected function set()
     {
         try {
@@ -26,6 +36,12 @@ class Config implements ConfigInterface
         }
     }
 
+    /**
+     * Get the value of the provided config key
+     *
+     * @param string $configKey
+     * @return string|false
+     */
     public function get($configKey)
     {
        try {

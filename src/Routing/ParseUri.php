@@ -2,14 +2,18 @@
 
 class ParseUri implements ParseUriInterface
 {
+    /**
+     * Current URI, set via .htaccess
+     *
+     * @var string $uri;
+     */
     protected $uri;
-    protected $uriArray = array();
-    protected $controller;
-    protected $model;
-    protected $view;
-    protected $action;
-    protected $parameters = array();
 
+    /**
+     * Constructor
+     *
+     * @param string $uri
+     */
     public function __construct($uri)
     {
         $this->uri = $uri;
@@ -18,6 +22,11 @@ class ParseUri implements ParseUriInterface
         $this->uriArray = explode('/',$this->uri);
     }
 
+    /**
+     * Parse controller
+     *
+     * @return string
+     */
     public function controller()
     {
         if (isset($this->uriArray[0]) && !empty($this->uriArray[0])) {
@@ -29,6 +38,11 @@ class ParseUri implements ParseUriInterface
         return $this->controller;
     }
 
+    /**
+     * Parse model
+     *
+     * @return string
+     */
     public function model()
     {
         if ($this->controller()) {
@@ -37,6 +51,11 @@ class ParseUri implements ParseUriInterface
         }
     }
 
+    /**
+     * Parse view
+     *
+     * @return string
+     */
     public function view()
     {
         if ($this->controller()) {
@@ -45,6 +64,11 @@ class ParseUri implements ParseUriInterface
         }
     }
 
+    /**
+     * Parse action
+     *
+     * @return string
+     */
     public function action()
     {
         //if action is set and not empty (it would be empty if the user types a '/' of the uri
@@ -57,6 +81,11 @@ class ParseUri implements ParseUriInterface
         return $this->action;
     }
 
+    /**
+     * Parse parameters
+     *
+     * @return array
+     */
     public function parameters()
     {
         if (isset($this->uriArray[2]) && !empty($this->uriArray[2])) {
