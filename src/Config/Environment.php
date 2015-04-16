@@ -45,7 +45,7 @@ class Environment implements EnvironmentInterface
     }
 
     /*
-     * If set to 'off', prevent page-caching
+     * Pass 'off' to prevent page-caching
      */
     public function setHeaders($parameter) {
 

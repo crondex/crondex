@@ -1,6 +1,7 @@
 <?php namespace Crondex\Session;
 
-/** This class extends SessionHandler, which exposes the internal PHP session save handler.
+ /** 
+  * This class extends SessionHandler, which exposes the internal PHP session save handler.
   * This allows you to override the methods, intercept, or filter them by calls to the
   * parent class methods which ultimately wrap the interal PHP session handlers. 
   *
@@ -22,7 +23,12 @@ class SessionManager extends \SessionHandler
     //uncomment next line if encrypting data
     //private $sessionKey;
 
-    //remove '= null' from the constructor argument if injecting key
+    /**
+     * Constructor
+     *
+     * @param object $config
+     * @param string $sessionKey (remove '=null' to inject key)
+     */
 
     public function __construct($config, $sessionKey = null, $maxlife = 1440)
     {
